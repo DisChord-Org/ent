@@ -39,8 +39,10 @@ const InstanciaEnt = new GestorEnt();
 
 GestorEnt.cargar(); // Carga el archivo .env al iniciar el programa
 
-export const ent = new Proxy({}, {
+const ent = new Proxy({}, {
     get(_, prop: string) {
         return InstanciaEnt.obtenerVariable(prop);
     }
 });
+
+export default ent;
