@@ -1,47 +1,94 @@
 // ent.chord
 // ¿env? nah, ent (entorno).
-// se supone que Chord es en español, por lo que las variables serán en español.
 
 import fs from 'fs';
 
-class GestorEnt {
+class EntManager {
     /**
-     * Lee y carga el archivo .env en memoria
+     * Reads and loads the .env file in memory
      */
-    public static cargar(path: string = '.env'): void {
-        if (!fs.existsSync(path)) return;
+    public static load (path: string = '.env'): boolean {
+        if (!fs.existsSync(path)) return false;
 
-        const contenido = fs.readFileSync(path, 'utf-8');
-        const lineas = contenido.split(/\r?\n/);
+        const content = fs.readFileSync(path, 'utf-8');
+        const lines = content.split(/\r?\n/);
 
-        for (const linea of lineas) {
-            const recorte = linea.trim();
-            if (!recorte || recorte.startsWith('#')) continue;
+        for (const line of lines) {
+            const trim = line.trim();
+            if (!trim || trim.startsWith('#')) continue;
 
-            const igualado = recorte.match(/^([^=]+)=(.*)$/);
-            if (igualado) {
-                const clave = igualado[1].trim();
-                let valor = igualado[2].trim();
+            const matched = trim.match(/^([^=]+)=(.*)$/);
+            if (matched) {
+                const key = matched[1].trim();
+                let value = matched[2].trim();
 
-                valor = valor.replace(/^['"]|['"]$/g, '');
+                value = value.replace(/^['"]|['"]$/g, '');
 
-                process.env[clave] = valor; 
+                process.env[key] = value; 
             }
         }
+
+        return true;
     }
 
-    obtenerVariable(nombre: string) {
-        return process.env[nombre];
+    /**
+     * Gets the var from proecss env
+     * @param name - Name of the prop
+     * @returns The prop from process env
+     */
+    getVariable(name: string) {
+        return process.env[name];
     }
 }
 
-const InstanciaEnt = new GestorEnt();
+const EntInstance = new EntManager();
 
-GestorEnt.cargar(); // Carga el archivo .env al iniciar el programa
+// Automatic fallback loading: try '.env' first, then '.ent'
+if (!EntManager.load()) EntManager.load('.ent');
 
-const ent = new Proxy({}, {
-    get(_, prop: string) {
-        return InstanciaEnt.obtenerVariable(prop);
+/**
+ * Reactive Proxy exposing loaded process.env variables as a transparent object.
+ */
+export const ent = new Proxy({} as Record<string, string | undefined>, {
+    /**
+     * Intercepts property access (e.g. ent.PORT or ent['PORT'])
+     */
+    get(_, prop: string | symbol) {
+        if (typeof prop === 'symbol') return undefined;
+        return EntInstance.getVariable(prop);
+    },
+
+    /**
+     * Intercepts Object.keys(ent), Object.getOwnPropertyNames(ent), and console.log inspection
+     */
+    ownKeys() {
+        return Reflect.ownKeys(process.env);
+    },
+
+    /**
+     * Required for traps like ownKeys, Object.assign, or console.log 
+     * to properly describe each property of process.env
+     */
+    getOwnPropertyDescriptor(_, prop: string | symbol) {
+        if (typeof prop === 'symbol') return undefined;
+        
+        const value = EntInstance.getVariable(prop);
+        if (value === undefined) return undefined;
+
+        return {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value
+        };
+    },
+
+    /**
+     * Intercepts the 'in' operator (e.g. 'PORT' in ent)
+     */
+    has(_, prop: string | symbol) {
+        if (typeof prop === 'symbol') return false;
+        return prop in process.env;
     }
 });
 

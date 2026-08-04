@@ -1,35 +1,27 @@
 # Gestión de Entorno
-"Porque en Chord hablamos español, y el entorno no es una excepción."
-
 `ent` es una utilidad ligera para DisChord diseñada para cargar y gestionar variables de entorno desde archivos `.env` de forma sencilla y natural. Olvídate de configuraciones pesadas; simplemente carga tu entorno y accede a tus variables como si fueran propiedades nativas del lenguaje.
 
 ## Características
-- Sintaxis en Español: Fiel a la filosofía de DisChord.
 - Proxy Dinámico: Acceso limpio a las variables mediante ent.TU_VARIABLE.
 - Ligero: Basado en fs nativo, sin dependencias externas innecesarias.
 - Limpieza Automática: Ignora comentarios (#) y líneas vacías, además de limpiar comillas automáticamente.
 
 ## Uso rápido
-1. Prepara tu archivo `.env`
+1. Prepara tu archivo `.env` o `.ent`
 
 ```
-TOKEN_DISCORD=mi_token_secreto
+TOKEN_DISCORD="mi_token_secreto"
 PUERTO=3000
-
-# Comentario ignorado
 MENSAJE="Hola desde DisChord"
 ```
 
 2. Carga y usa las variables
-```typescript
-import { GestorEnt, ent } from './lib/ent.chord';
-
-// Cargar el archivo (por defecto busca '.env')
-GestorEnt.cargar();
+```chord
+importar ent desde "lib:ent";
 
 // Acceder a las variables de forma dinámica
-console.log(ent.TOKEN_DISCORD); // 'mi_token_secreto'
-console.log(ent.MENSAJE);       // 'Hola desde DisChord'
+consola.imprimir(ent.TOKEN_DISCORD); // 'mi_token_secreto'
+consola.imprimir(ent[MENSAJE]);       // 'Hola desde DisChord'
 ```
 
 ## Funcionamiento Interno
