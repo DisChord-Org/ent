@@ -1,0 +1,108 @@
+importar { entorno, variableEntorno, establecerVariableEntorno } desde "lib:procesos"
+importar { existe, leer } desde "lib:sf"
+
+@asincrono
+funcion archivoExiste(ruta) {
+    devolver existe(ruta)
+}
+
+@asincrono
+funcion leerArchivo(ruta) {
+    devolver leer(ruta)
+}
+
+funcion limpiarComillas(valor) {
+    var primero es valor.charCodeAt(0)
+    var ultimo es valor.charCodeAt(valor.longitud - 1)
+    var esComilla es primero == 34 o primero == 39
+
+    si (esComilla y primero == ultimo) {
+        devolver valor.cortar(1, valor.longitud - 1)
+    }
+
+    devolver valor
+}
+
+funcion procesarLinea(linea) {
+    var limpia es linea.limpiar()
+
+    si (limpia.longitud == 0) {
+        devolver
+    }
+
+    si (limpia.empiezaCon("#")) {
+        devolver
+    }
+
+    var indice es limpia.indiceDe("=")
+
+    si (indice < 0) {
+        devolver
+    }
+
+    var clave es limpia.cortar(0, indice).limpiar()
+    var valor es limpiarComillas(limpia.cortar(indice + 1).limpiar())
+
+    establecerVariableEntorno(clave, valor)
+}
+
+@asincrono
+funcion cargar(ruta) {
+    var existeArchivo es archivoExiste(ruta)
+
+    si (no existeArchivo) {
+        devolver falso
+    }
+
+    var contenido es leerArchivo(ruta)
+    var lineas es contenido.partir(intro)
+
+    para (linea en lineas) {
+        procesarLinea(linea)
+    }
+
+    devolver verdadero
+}
+
+@asincrono
+funcion inicializar() {
+    var cargado es cargar(".env")
+
+    si (no cargado) {
+        cargar(".ent")
+    }
+}
+
+inicializar()
+
+@BDOI
+var gestor es {
+    funcion get(objetivo, propiedad) {
+        devolver variableEntorno(propiedad)
+    }
+
+    funcion has(objetivo, propiedad) {
+        devolver variableEntorno(propiedad) != indefinido
+    }
+
+    funcion ownKeys(objetivo) {
+        devolver Object.keys(entorno())
+    }
+
+    funcion getOwnPropertyDescriptor(objetivo, propiedad) {
+        var valor es variableEntorno(propiedad)
+
+        si (valor == indefinido) {
+            devolver indefinido
+        }
+
+        devolver {
+            enumerable verdadero;
+            configurable verdadero;
+            writable verdadero;
+            value valor;
+        }
+    }
+}
+
+exportar var ent es nuevo Proxy({}, gestor)
