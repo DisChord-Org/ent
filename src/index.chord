@@ -13,35 +13,35 @@ funcion leerArchivo(ruta) {
 
 funcion limpiarComillas(valor) {
     var primero es valor.charCodeAt(0)
-    var ultimo es valor.charCodeAt(valor.length - 1)
+    var ultimo es valor.charCodeAt(valor.longitud - 1)
     var esComilla es primero == 34 o primero == 39
 
     si (esComilla y primero == ultimo) {
-        devolver valor.substring(1, valor.length - 1)
+        devolver valor.cortar(1, valor.longitud - 1)
     }
 
     devolver valor
 }
 
 funcion procesarLinea(linea) {
-    var limpia es linea.trim()
+    var limpia es linea.limpiar()
 
-    si (limpia.length == 0) {
+    si (limpia.longitud == 0) {
         devolver
     }
 
-    si (limpia.startsWith("#")) {
+    si (limpia.empiezaCon("#")) {
         devolver
     }
 
-    var indice es limpia.indexOf("=")
+    var indice es limpia.indiceDe("=")
 
     si (indice < 0) {
         devolver
     }
 
-    var clave es limpia.substring(0, indice).trim()
-    var valor es limpiarComillas(limpia.substring(indice + 1).trim())
+    var clave es limpia.cortar(0, indice).limpiar()
+    var valor es limpiarComillas(limpia.cortar(indice + 1).limpiar())
 
     establecerVariableEntorno(clave, valor)
 }
@@ -55,7 +55,7 @@ funcion cargar(ruta) {
     }
 
     var contenido es leerArchivo(ruta)
-    var lineas es contenido.split(intro)
+    var lineas es contenido.partir(intro)
 
     para (linea en lineas) {
         procesarLinea(linea)

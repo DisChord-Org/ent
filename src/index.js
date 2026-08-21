@@ -11,7 +11,7 @@ function limpiarComillas(valor) {
     let ultimo = valor.charCodeAt(valor.length - 1);
     let esComilla = primero == 34 || primero == 39;
     if (esComilla && primero == ultimo) {
-        return valor.substring(1, valor.length - 1);
+        return valor.slice(1, valor.length - 1);
     }
     return valor;
 }
@@ -27,8 +27,8 @@ function procesarLinea(linea) {
     if (indice < 0) {
         return;
     }
-    let clave = limpia.substring(0, indice).trim();
-    let valor = limpiarComillas(limpia.substring(indice + 1).trim());
+    let clave = limpia.slice(0, indice).trim();
+    let valor = limpiarComillas(limpia.slice(indice + 1).trim());
     establecerVariableEntorno(clave, valor);
 }
 async function cargar(ruta) {
