@@ -12,8 +12,12 @@ funcion leerArchivo(ruta) {
 }
 
 funcion limpiarComillas(valor) {
-    var primero es valor.charCodeAt(0)
-    var ultimo es valor.charCodeAt(valor.longitud - 1)
+    si (valor.longitud == 0) {
+        devolver valor
+    }
+
+    var primero es valor.codigoEn(0)
+    var ultimo es valor.codigoEn(valor.longitud - 1)
     var esComilla es primero == 34 o primero == 39
 
     si (esComilla y primero == ultimo) {
@@ -86,7 +90,7 @@ var gestor es {
     }
 
     funcion ownKeys(objetivo) {
-        devolver Object.keys(entorno())
+        devolver BDO.claves(entorno())
     }
 
     funcion getOwnPropertyDescriptor(objetivo, propiedad) {
@@ -97,12 +101,12 @@ var gestor es {
         }
 
         devolver {
-            enumerable verdadero;
-            configurable verdadero;
-            writable verdadero;
-            value valor;
+            enumerable verdadero
+            configurable verdadero
+            writable verdadero
+            value valor
         }
     }
 }
 
-exportar var ent es nuevo Proxy({}, gestor)
+exportar var ent es js("new Proxy({}, gestor)")
